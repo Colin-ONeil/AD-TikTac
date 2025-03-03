@@ -5,6 +5,81 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background-color: #f4f4f4;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+			}
+			nav {
+				width: 100%;
+				background: #333;
+				padding: 15px;
+				text-align: center;
+				position: fixed;
+				top: 0;
+				left: 0;
+			}
+			nav a {
+				color: white;
+				text-decoration: none;
+				margin: 0 15px;
+				font-size: 18px;
+			}
+			nav a:hover {
+				color: #f4a261;
+			}
+			#board {
+				display: grid;
+				grid-template-columns: repeat(3, 100px);
+				grid-template-rows: repeat(3, 100px);
+				gap: 5px;
+				background-color: #333;
+				padding: 5px;
+				border-radius: 10px;
+				margin-top: 80px;
+			}
+			.cell {
+				width: 100px;
+				height: 100px;
+				background-color: #fff;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-size: 2em;
+				font-weight: bold;
+				cursor: pointer;
+				border-radius: 5px;
+			}
+			.cell:hover {
+				background-color: #eee;
+			}
+			.controls {
+				margin-top: 20px;
+			}
+			button {
+				padding: 10px 20px;
+				margin: 5px;
+				font-size: 1em;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			#undo {
+				background-color: #007bff;
+				color: white;
+			}
+			#undo:hover {
+				background-color: #0056b3;
+			}
+		</style>
 	</head>
 	<body>
 		<!-- Navigation Bar -->
@@ -15,15 +90,66 @@
 		</nav>
 
 		<!-- Main Content -->
-		<div class="container">
-			<h1>Play Tic-Tac-Toe</h1>
-			<p>Enjoy a simple Tic-Tac-Toe game!</p>
-			<iframe src="tictactoe-game.html" width="500" height="500"></iframe>
+		<h1>Tic-Tac-Toe</h1>
+		<div id="board">
+			<div class="cell" data-index="0"></div>
+			<div class="cell" data-index="1"></div>
+			<div class="cell" data-index="2"></div>
+			<div class="cell" data-index="3"></div>
+			<div class="cell" data-index="4"></div>
+			<div class="cell" data-index="5"></div>
+			<div class="cell" data-index="6"></div>
+			<div class="cell" data-index="7"></div>
+			<div class="cell" data-index="8"></div>
+		</div>
+		<div class="controls">
+			<button id="undo">Undo</button>
 		</div>
 
-		<!-- Footer -->
-		<footer>
-			<p>&copy; 2025 [Your Name]. All Rights Reserved.</p>
-		</footer>
+		<!-- Tic-Tac-Toe Logic -->
+		<script>
+			let moveStack = []; // Stack to track the sequence of moves
+
+			// Function to handle cell clicks
+			const handleCellClick = (event) => {
+				const cell = event.target;
+				const index = parseInt(cell.dataset.index);
+
+				// Notify the game.js logic of the cell click
+				if (typeof game !== "undefined" && typeof game.onCellClick === "function") {
+					game.onCellClick(index);
+				}
+
+				// Push the move into the stack for undo functionality
+				moveStack.push(index);
+				console.log(`Move recorded: ${index}`);
+			};
+
+			// Function to handle undo button
+			const handleUndo = () => {
+				if (moveStack.length > 0) {
+					const lastMove = moveStack.pop(); // Remove the last move
+					console.log(`Undo move: ${lastMove}`);
+
+					// Notify the game.js logic of the undo
+					if (typeof game !== "undefined" && typeof game.onUndo === "function") {
+						game.onUndo(lastMove);
+					}
+
+					return lastMove; // Return the undone move's index
+				} else {
+					console.log("No moves to undo.");
+					return null;
+				}
+			};
+
+			// Add event listeners to all cells
+			document.querySelectorAll(".cell").forEach((cell) =>
+				cell.addEventListener("click", handleCellClick)
+			);
+
+			// Add event listener to the undo button
+			document.getElementById("undo").addEventListener("click", handleUndo);
+		</script>
 	</body>
 </html>
