@@ -36,6 +36,9 @@
 			nav a:hover {
 				color: #f4a261;
 			}
+			h1, h2 {
+				margin-top: 80px;
+			}
 			#board {
 				display: grid;
 				grid-template-columns: repeat(3, 100px);
@@ -44,7 +47,7 @@
 				background-color: #333;
 				padding: 5px;
 				border-radius: 10px;
-				margin-top: 80px;
+				margin-top: 20px;
 			}
 			.cell {
 				width: 100px;
@@ -57,12 +60,13 @@
 				font-weight: bold;
 				cursor: pointer;
 				border-radius: 5px;
+				user-select: none;
 			}
-			.cell:hover {
-				background-color: #eee;
-			}
+			.cell.blue { color: blue; }
+			.cell.red { color: red; }
 			.controls {
 				margin-top: 20px;
+				text-align: center;
 			}
 			button {
 				padding: 10px 20px;
@@ -79,6 +83,10 @@
 			#undo:hover {
 				background-color: #0056b3;
 			}
+			#counters {
+				margin-top: 20px;
+				font-size: 18px;
+			}
 		</style>
 	</head>
 	<body>
@@ -91,6 +99,8 @@
 
 		<!-- Main Content -->
 		<h1>Tic-Tac-Toe</h1>
+		<h2 id="turn">Turn: Blue</h2>
+
 		<div id="board">
 			<div class="cell" data-index="0"></div>
 			<div class="cell" data-index="1"></div>
@@ -102,53 +112,100 @@
 			<div class="cell" data-index="7"></div>
 			<div class="cell" data-index="8"></div>
 		</div>
+
 		<div class="controls">
 			<button id="undo">Undo</button>
 		</div>
 
+		<!-- Scoreboard -->
+		<div id="counters">
+			<p>Blue Wins: <span id="blue-wins">0</span> | Red Wins: <span id="red-wins">0</span></p>
+		</div>
+
 		<!-- Tic-Tac-Toe Logic -->
 		<script>
-			let moveStack = []; // Stack to track the sequence of moves
+			let board = Array(9).fill(null); // Board state
+			let moveStack = []; // Stack for undo
+			let currentPlayer = "Blue"; // Start with Blue
+			let blueWins = 0, redWins = 0; // Team counters
 
-			// Function to handle cell clicks
+			const winningCombos = [
+				[0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+				[0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+				[0, 4, 8], [2, 4, 6]  // Diagonals
+			];
+
 			const handleCellClick = (event) => {
-				const cell = event.target;
-				const index = parseInt(cell.dataset.index);
+				const index = parseInt(event.target.dataset.index);
+				if (board[index] === null) {
+					// Mark move and update UI
+					board[index] = currentPlayer;
+					event.target.textContent = currentPlayer === "Blue" ? "O" : "X";
+					event.target.classList.add(currentPlayer.toLowerCase());
+					moveStack.push(index);
 
-				// Notify the game.js logic of the cell click
-				if (typeof game !== "undefined" && typeof game.onCellClick === "function") {
-					game.onCellClick(index);
-				}
-
-				// Push the move into the stack for undo functionality
-				moveStack.push(index);
-				console.log(`Move recorded: ${index}`);
-			};
-
-			// Function to handle undo button
-			const handleUndo = () => {
-				if (moveStack.length > 0) {
-					const lastMove = moveStack.pop(); // Remove the last move
-					console.log(`Undo move: ${lastMove}`);
-
-					// Notify the game.js logic of the undo
-					if (typeof game !== "undefined" && typeof game.onUndo === "function") {
-						game.onUndo(lastMove);
+					// Check for winner
+					if (checkWinner()) {
+						alert(`${currentPlayer} Wins!`);
+						updateCounters();
+						resetGame();
+						return;
 					}
 
-					return lastMove; // Return the undone move's index
-				} else {
-					console.log("No moves to undo.");
-					return null;
+					// Switch players
+					currentPlayer = currentPlayer === "Blue" ? "Red" : "Blue";
+					document.getElementById("turn").textContent = `Turn: ${currentPlayer}`;
 				}
 			};
 
-			// Add event listeners to all cells
-			document.querySelectorAll(".cell").forEach((cell) =>
+			const checkWinner = () => {
+				for (const combo of winningCombos) {
+					const [a, b, c] = combo;
+					if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+						return true;
+					}
+				}
+				return board.every(cell => cell !== null); // Check for draw
+			};
+
+			const updateCounters = () => {
+				if (currentPlayer === "Blue") {
+					blueWins++;
+					document.getElementById("blue-wins").textContent = blueWins;
+				} else {
+					redWins++;
+					document.getElementById("red-wins").textContent = redWins;
+				}
+			};
+
+			const handleUndo = () => {
+				if (moveStack.length > 0) {
+					const lastMove = moveStack.pop();
+					board[lastMove] = null;
+					const cell = document.querySelector(`.cell[data-index="${lastMove}"]`);
+					cell.textContent = "";
+					cell.classList.remove("blue", "red");
+
+					// Switch turn back
+					currentPlayer = currentPlayer === "Blue" ? "Red" : "Blue";
+					document.getElementById("turn").textContent = `Turn: ${currentPlayer}`;
+				}
+			};
+
+			const resetGame = () => {
+				board.fill(null);
+				moveStack = [];
+				document.querySelectorAll(".cell").forEach(cell => {
+					cell.textContent = "";
+					cell.classList.remove("blue", "red");
+				});
+				currentPlayer = "Blue";
+				document.getElementById("turn").textContent = "Turn: Blue";
+			};
+
+			document.querySelectorAll(".cell").forEach(cell =>
 				cell.addEventListener("click", handleCellClick)
 			);
-
-			// Add event listener to the undo button
 			document.getElementById("undo").addEventListener("click", handleUndo);
 		</script>
 	</body>
