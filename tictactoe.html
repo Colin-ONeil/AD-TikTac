@@ -87,6 +87,16 @@
 				margin-top: 20px;
 				font-size: 18px;
 			}
+			.container {
+				max-width: 800px;
+				margin: auto;
+				padding: 20px;
+				background: white;
+				box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+				border-radius: 8px;
+				text-align: left;
+				margin-top: 30px;
+			}
 		</style>
 	</head>
 	<body>
@@ -122,6 +132,16 @@
 			<p>Blue Wins: <span id="blue-wins">0</span> | Red Wins: <span id="red-wins">0</span></p>
 		</div>
 
+		<!-- Creative Process -->
+		<div class="container">
+			<h2>Creative Process</h2>
+			<p>I designed this Tic-Tac-Toe game to be interactive and engaging. The game includes two teams: Blue and Red. Players take turns placing their marks, and the game detects wins, losses, and draws.</p>
+			<p>One of the main challenges I faced was implementing the **undo button**. Since moves needed to be reversible, I used a **stack data structure** to track moves and allow the game state to be undone correctly.</p>
+			<p>Another challenge was ensuring the **win detection worked properly**. Initially, some win conditions weren’t being detected, but I fixed this by checking each move against pre-defined winning combinations.</p>
+			<p>The game logic also prevents a player from overwriting a cell and properly switches turns. The scoreboard updates dynamically, keeping track of both team victories.</p>
+			<p>This project helped me understand how to structure game logic in JavaScript, handle UI updates dynamically, and improve my problem-solving skills in debugging interactive web applications.</p>
+		</div>
+
 		<!-- Tic-Tac-Toe Logic -->
 		<script>
 			let board = Array(9).fill(null); // Board state
@@ -152,6 +172,13 @@
 						return;
 					}
 
+					// Check for draw
+					if (!board.includes(null)) {
+						alert("It's a Draw!");
+						resetGame();
+						return;
+					}
+
 					// Switch players
 					currentPlayer = currentPlayer === "Blue" ? "Red" : "Blue";
 					document.getElementById("turn").textContent = `Turn: ${currentPlayer}`;
@@ -165,7 +192,7 @@
 						return true;
 					}
 				}
-				return board.every(cell => cell !== null); // Check for draw
+				return false;
 			};
 
 			const updateCounters = () => {
@@ -185,8 +212,6 @@
 					const cell = document.querySelector(`.cell[data-index="${lastMove}"]`);
 					cell.textContent = "";
 					cell.classList.remove("blue", "red");
-
-					// Switch turn back
 					currentPlayer = currentPlayer === "Blue" ? "Red" : "Blue";
 					document.getElementById("turn").textContent = `Turn: ${currentPlayer}`;
 				}
@@ -203,9 +228,7 @@
 				document.getElementById("turn").textContent = "Turn: Blue";
 			};
 
-			document.querySelectorAll(".cell").forEach(cell =>
-				cell.addEventListener("click", handleCellClick)
-			);
+			document.querySelectorAll(".cell").forEach(cell => cell.addEventListener("click", handleCellClick));
 			document.getElementById("undo").addEventListener("click", handleUndo);
 		</script>
 	</body>
