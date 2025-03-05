@@ -48,6 +48,16 @@
 				background: #333;
 				color: white;
 			}
+			.text-container {
+				max-width: 800px;
+				margin: auto;
+				padding: 20px;
+				background: white;
+				box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+				border-radius: 8px;
+				text-align: left;
+				margin-top: 30px;
+			}
 		</style>
 	</head>
 	<body>
@@ -63,8 +73,18 @@
 			<h1>Chicken Game Demo</h1>
 			<p>Watch the gameplay demo of my Chicken Game below!</p>
 
-			<!-- Replace VIDEO_ID with your actual YouTube video ID -->
+			<!-- Embedded YouTube Video -->
 			<iframe src="https://www.youtube.com/embed/0fMHyPUIn1E" frameborder="0" allowfullscreen></iframe>
+		</div>
+
+		<!-- Creative Process Write-up -->
+		<div class="text-container">
+			<h2>Creative Process</h2>
+			<p>I used two buttons, a speaker, and an LCD screen for my project. The buttons record the user's input while playing, with one button being a continue and the other a stop turn. The button inputs tell the LCD to update and the speaker to play a sound. Both the speaker and the screen provide feedback to the user, with the screen displaying the score and the speaker playing noises depending on whether the user is losing, continuing, or getting a high score.</p>
+
+			<p>I had never worked with Arduino and breadboards. One of the first challenges I faced was getting the screen to work correctly; when wiring it up, I first forgot to add a resistor to one of the rows, making the screen malfunction. Another problem I came across was that the code for the game wasn't working as intended with my inputs. Although it seemed like a coding issue, it was actually a wiring issue. I overcame these challenges by ensuring my wiring was correct before testing.</p>
+
+			<p>My code uses the LiquidCrystal library, which has functions like <code>lcd.clear()</code>, <code>lcd.print()</code>, and <code>lcd.setCursor()</code>. Each is self-explanatory: <code>clear()</code> clears the screen, <code>print()</code> displays text or numbers, and <code>setCursor()</code> positions the text. Arduino has the convenient <code>loop()</code> function that does precisely what its name suggests—it loops continuously, allowing my program to change and respond dynamically. In my loop function, I have <code>moveChicken()</code> and <code>stopChicken()</code>, and each function's meaning closely follows its name. The <code>moveChicken()</code> function is conditional on continuing the game, where a crash value is checked with a random number for each move.</p>
 		</div>
 
 		<!-- Footer -->
