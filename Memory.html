@@ -99,15 +99,10 @@
       <tr><th>Term</th><th>Example</th></tr>
     </thead>
     <tbody id="pairTableBody">
-      <tr><td contenteditable="true">Alliteration</td><td contenteditable="true">Peter Piper picked a peck of pickled peppers.</td></tr>
-      <tr><td contenteditable="true">Assonance</td><td contenteditable="true">The rain in Spain stays mainly in the plain.</td></tr>
-      <tr><td contenteditable="true">Consonance</td><td contenteditable="true">The lumpy, bumpy road.</td></tr>
-      <tr><td contenteditable="true">Metaphor</td><td contenteditable="true">Time is a thief.</td></tr>
-      <tr><td contenteditable="true">Simile</td><td contenteditable="true">Her smile was as bright as the sun.</td></tr>
-      <tr><td contenteditable="true">Personification</td><td contenteditable="true">The wind whispered through the trees.</td></tr>
     </tbody>
   </table>
 
+  <button onclick="addRow()">Add Row</button>
   <button onclick="startGame()">Start Game</button>
 
   <div class="grid" id="gameBoard"></div>
@@ -117,13 +112,20 @@
   </footer>
 
   <script>
+    function addRow() {
+      const tableBody = document.getElementById('pairTableBody');
+      const row = document.createElement('tr');
+      row.innerHTML = '<td contenteditable="true"></td><td contenteditable="true"></td>';
+      tableBody.appendChild(row);
+    }
+
     function startGame() {
       const table = document.getElementById('pairTableBody');
       const rows = table.querySelectorAll('tr');
       const pairs = Array.from(rows).map(row => [
         row.cells[0].textContent.trim(),
         row.cells[1].textContent.trim()
-      ]);
+      ]).filter(pair => pair[0] && pair[1]);
 
       const cards = [...pairs, ...pairs].flat().sort(() => 0.5 - Math.random());
       const board = document.getElementById('gameBoard');
@@ -183,6 +185,9 @@
 
       cards.forEach(content => createCard(content));
     }
+
+    // Add one row on initial load for user convenience
+    window.onload = addRow;
   </script>
 </body>
 </html>
