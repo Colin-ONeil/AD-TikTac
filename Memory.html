@@ -67,6 +67,21 @@
       font-size: 16px;
       cursor: pointer;
     }
+    .pair-table {
+      width: 90%;
+      max-width: 600px;
+      margin: 30px auto;
+      border-collapse: collapse;
+      background: white;
+    }
+    .pair-table th, .pair-table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    .pair-table th {
+      background-color: #eee;
+    }
     footer {
       text-align: center;
       margin-top: 30px;
@@ -85,7 +100,7 @@
     <a href="literary-match.html">Memory Match</a>
   </nav>
 
-  <h1>🎴 Memory Match</h1>
+  <h1>Memory Match</h1>
 
   <div class="editor">
     <h3>Edit Terms and Examples</h3>
@@ -99,6 +114,13 @@ Personification|The wind whispered through the trees.</textarea>
   </div>
 
   <div class="grid" id="gameBoard"></div>
+
+  <table class="pair-table">
+    <thead>
+      <tr><th>Term</th><th>Example</th></tr>
+    </thead>
+    <tbody id="pairTableBody"></tbody>
+  </table>
 
   <footer>
     <p>&copy; 2025 Colin O’Neil. All Rights Reserved.</p>
@@ -116,8 +138,10 @@ Personification|The wind whispered through the trees.</textarea>
       pairs = parsePairs(input);
       const cards = [...pairs, ...pairs].flat().sort(() => 0.5 - Math.random());
       const board = document.getElementById('gameBoard');
+      const tableBody = document.getElementById('pairTableBody');
 
       board.innerHTML = '';
+      tableBody.innerHTML = '';
 
       let firstCard = null;
       let secondCard = null;
@@ -170,9 +194,16 @@ Personification|The wind whispered through the trees.</textarea>
       }
 
       cards.forEach(content => createCard(content));
+
+      pairs.forEach(([term, example]) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${term}</td><td>${example}</td>`;
+        tableBody.appendChild(row);
+      });
     }
 
     window.onload = initializeGame;
   </script>
 </body>
 </html>
+
