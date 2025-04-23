@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Memory Match</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    nav {
+      background: #333;
+      padding: 15px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-size: 18px;
+    }
+    nav a:hover {
+      color: #f4a261;
+    }
+    h1 {
+      margin-top: 20px;
+      text-align: center;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 150px);
+      grid-gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .card {
+      background-color: white;
+      border: 2px solid #333;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .card.flipped, .card.matched {
+      background-color: #c1f0c1;
+      cursor: default;
+    }
+    .editor {
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      padding: 15px;
+      background: #333;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="Chicken.html">Chicken Game</a>
+    <a href="tictactoe.html">Tic-Tac-Toe</a>
+    <a href="literary-match.html">Memory Match</a>
+  </nav>
+
+  <h1>🎴 Memory Match</h1>
+
+  <div class="editor">
+    <h3>Edit Terms and Examples</h3>
+    <textarea id="editorInput">Alliteration|Peter Piper picked a peck of pickled peppers.
+Assonance|The rain in Spain stays mainly in the plain.
+Consonance|The lumpy, bumpy road.
+Metaphor|Time is a thief.
+Simile|Her smile was as bright as the sun.
+Personification|The wind whispered through the trees.</textarea>
+    <button onclick="initializeGame()">Update Game</button>
+  </div>
+
+  <div class="grid" id="gameBoard"></div>
+
+  <footer>
+    <p>&copy; 2025 Colin O’Neil. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    let pairs = [];
+
+    function parsePairs(text) {
+      return text.split('\n').map(line => line.split('|').map(item => item.trim())).filter(pair => pair.length === 2);
+    }
+
+    function initializeGame() {
+      const input = document.getElementById('editorInput').value;
+      pairs = parsePairs(input);
+      const cards = [...pairs, ...pairs].flat().sort(() => 0.5 - Math.random());
+      const board = document.getElementById('gameBoard');
+
+      board.innerHTML = '';
+
+      let firstCard = null;
+      let secondCard = null;
+      let lockBoard = false;
+
+      function createCard(content) {
+        const card = document.createElement('div');
+        card.classList.add('card');
+        card.dataset.content = content;
+        card.textContent = "";
+
+        card.addEventListener('click', () => {
+          if (lockBoard || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+
+          card.classList.add('flipped');
+          card.textContent = content;
+
+          if (!firstCard) {
+            firstCard = card;
+          } else {
+            secondCard = card;
+            lockBoard = true;
+
+            const isMatch = pairs.some(([term, example]) =>
+              (term === firstCard.dataset.content && example === secondCard.dataset.content) ||
+              (example === firstCard.dataset.content && term === secondCard.dataset.content)
+            );
+
+            if (isMatch) {
+              firstCard.classList.add('matched');
+              secondCard.classList.add('matched');
+              resetBoard();
+            } else {
+              setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                firstCard.textContent = "";
+                secondCard.textContent = "";
+                resetBoard();
+              }, 1000);
+            }
+          }
+        });
+        board.appendChild(card);
+      }
+
+      function resetBoard() {
+        [firstCard, secondCard] = [null, null];
+        lockBoard = false;
+      }
+
+      cards.forEach(content => createCard(content));
+    }
+
+    window.onload = initializeGame;
+  </script>
+</body>
+</html>
