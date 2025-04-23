@@ -29,11 +29,12 @@
       text-align: center;
     }
     .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 150px);
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       grid-gap: 15px;
       justify-content: center;
       margin-top: 20px;
+      padding: 0 20px;
     }
     .card {
       background-color: white;
@@ -52,24 +53,9 @@
       background-color: #c1f0c1;
       cursor: default;
     }
-    .editor {
-      margin: 20px auto;
-      width: 90%;
-      max-width: 600px;
-    }
-    textarea {
-      width: 100%;
-      height: 150px;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
     .pair-table {
       width: 90%;
-      max-width: 600px;
+      max-width: 800px;
       margin: 30px auto;
       border-collapse: collapse;
       background: white;
@@ -82,6 +68,13 @@
     .pair-table th {
       background-color: #eee;
     }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
     footer {
       text-align: center;
       margin-top: 30px;
@@ -92,56 +85,50 @@
   </style>
 </head>
 <body>
-  <!-- Navigation Bar -->
   <nav>
     <a href="index.html">Home</a>
     <a href="Chicken.html">Chicken Game</a>
     <a href="tictactoe.html">Tic-Tac-Toe</a>
-    <a href="literary-match.html">Memory Match</a>
+    <a href="Memory.html">Memory Match</a>
   </nav>
 
   <h1>Memory Match</h1>
-
-  <div class="editor">
-    <h3>Edit Terms and Examples</h3>
-    <textarea id="editorInput">Alliteration|Peter Piper picked a peck of pickled peppers.
-Assonance|The rain in Spain stays mainly in the plain.
-Consonance|The lumpy, bumpy road.
-Metaphor|Time is a thief.
-Simile|Her smile was as bright as the sun.
-Personification|The wind whispered through the trees.</textarea>
-    <button onclick="initializeGame()">Update Game</button>
-  </div>
-
-  <div class="grid" id="gameBoard"></div>
 
   <table class="pair-table">
     <thead>
       <tr><th>Term</th><th>Example</th></tr>
     </thead>
-    <tbody id="pairTableBody"></tbody>
+    <tbody id="pairTableBody">
+      <tr><td contenteditable="true">Alliteration</td><td contenteditable="true">Peter Piper picked a peck of pickled peppers.</td></tr>
+      <tr><td contenteditable="true">Assonance</td><td contenteditable="true">The rain in Spain stays mainly in the plain.</td></tr>
+      <tr><td contenteditable="true">Consonance</td><td contenteditable="true">The lumpy, bumpy road.</td></tr>
+      <tr><td contenteditable="true">Metaphor</td><td contenteditable="true">Time is a thief.</td></tr>
+      <tr><td contenteditable="true">Simile</td><td contenteditable="true">Her smile was as bright as the sun.</td></tr>
+      <tr><td contenteditable="true">Personification</td><td contenteditable="true">The wind whispered through the trees.</td></tr>
+    </tbody>
   </table>
+
+  <button onclick="startGame()">Start Game</button>
+
+  <div class="grid" id="gameBoard"></div>
 
   <footer>
     <p>&copy; 2025 Colin O’Neil. All Rights Reserved.</p>
   </footer>
 
   <script>
-    let pairs = [];
+    function startGame() {
+      const table = document.getElementById('pairTableBody');
+      const rows = table.querySelectorAll('tr');
+      const pairs = Array.from(rows).map(row => [
+        row.cells[0].textContent.trim(),
+        row.cells[1].textContent.trim()
+      ]);
 
-    function parsePairs(text) {
-      return text.split('\n').map(line => line.split('|').map(item => item.trim())).filter(pair => pair.length === 2);
-    }
-
-    function initializeGame() {
-      const input = document.getElementById('editorInput').value;
-      pairs = parsePairs(input);
       const cards = [...pairs, ...pairs].flat().sort(() => 0.5 - Math.random());
       const board = document.getElementById('gameBoard');
-      const tableBody = document.getElementById('pairTableBody');
-
       board.innerHTML = '';
-      tableBody.innerHTML = '';
+      board.style.display = 'grid';
 
       let firstCard = null;
       let secondCard = null;
@@ -185,6 +172,7 @@ Personification|The wind whispered through the trees.</textarea>
             }
           }
         });
+
         board.appendChild(card);
       }
 
@@ -194,16 +182,7 @@ Personification|The wind whispered through the trees.</textarea>
       }
 
       cards.forEach(content => createCard(content));
-
-      pairs.forEach(([term, example]) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `<td>${term}</td><td>${example}</td>`;
-        tableBody.appendChild(row);
-      });
     }
-
-    window.onload = initializeGame;
   </script>
 </body>
 </html>
-
